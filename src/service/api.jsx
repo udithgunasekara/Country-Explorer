@@ -1,70 +1,56 @@
-import React from 'react';
+// service/api.js
 import axios from 'axios';
 
-// Create an Axios instance with a base URL
+//just creating sessions for caching 
+
+
 const api = axios.create({
   baseURL: 'https://restcountries.com/v3.1/',
-  timeout: 5000, // 5 seconds timeout
+  timeout: 5000,
 });
 
-// API service functions
 const CountryService = {
-  /**
-   * Get all countries
-   * @returns {Promise} Array of country objects
-   */
   getAllCountries: async () => {
     try {
       const response = await api.get('/all');
+      if (!localStorage.key('countryService')){
+         localStorage.setItem('countryService', response.data);
+      }
+
+      if (!response){
+        return localStorage.getItem('countryService')
+      }
+      
       return response.data;
     } catch (error) {
-      console.error('Error fetching all countries:', error);
-      throw error;
+      throw new Error('Failed to fetch countries');
     }
   },
 
-  /**
-   * Search countries by name
-   * @param {string} name - Country name to search for
-   * @returns {Promise} Array of matching country objects
-   */
   searchByName: async (name) => {
     try {
       const response = await api.get(`/name/${name}`);
       return response.data;
     } catch (error) {
-      console.error(`Error searching countries by name (${name}):`, error);
-      throw error;
+      throw new Error('Country not found');
     }
   },
 
-  /**
-   * Filter countries by region
-   * @param {string} region - Region to filter by
-   * @returns {Promise} Array of country objects in the region
-   */
   filterByRegion: async (region) => {
     try {
       const response = await api.get(`/region/${region}`);
       return response.data;
     } catch (error) {
-      console.error(`Error filtering countries by region (${region}):`, error);
-      throw error;
+      throw new Error('Failed to filter by region');
     }
   },
 
-  /**
-   * Get country details by country code
-   * @param {string} code - Country code (cca2, cca3, ccn3)
-   * @returns {Promise} Country details object
-   */
   getByCountryCode: async (code) => {
     try {
       const response = await api.get(`/alpha/${code}`);
-      return response.data[0]; // Return the first (and only) country
+      return response.data[0];
     } catch (error) {
-      console.error(`Error fetching country by code (${code}):`, error);
-      throw error;
+      throw new Error('Invalid country code');
     }
   },
 };

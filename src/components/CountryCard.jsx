@@ -1,11 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useFavorites } from '../context/FavoritesContext';
 
 const CountryCard = ({ country }) => {
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const isFavorite = favorites.includes(country.cca3);
+
+  const handleFavorite = (e) => {
+    e.preventDefault();
+    isFavorite ? removeFavorite(country.cca3) : addFavorite(country.cca3);
+  };
+
   return (
     <Link 
       to={`/country/${country.name.common}`}
-      className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100"
+      className="group bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-600"
     >
       <div className="h-48 overflow-hidden relative">
         <img 
@@ -13,13 +22,19 @@ const CountryCard = ({ country }) => {
           alt={`Flag of ${country.name.common}`} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-purple-400"></div>
+        <button 
+          onClick={handleFavorite}
+          className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-gray-700/90 rounded-full shadow-sm hover:scale-110 transition-transform"
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          {isFavorite ? '❤️' : '🤍'}
+        </button>
       </div>
       <div className="p-5">
-        <h2 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-blue-600 transition-colors">
+        <h2 className="text-xl font-bold mb-3 text-gray-800 dark:text-white group-hover:text-blue-600 transition-colors">
           {country.name.common}
         </h2>
-        <div className="space-y-1 text-gray-600">
+        <div className="space-y-1 text-gray-600 dark:text-gray-300">
           <p className="flex items-center">
             <span className="inline-block w-4 h-4 mr-2 text-blue-500">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

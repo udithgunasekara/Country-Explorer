@@ -15,10 +15,11 @@ const CountryPage = () => {
   useEffect(() => {
     const fetchCountry = async () => {
       try {
-        // The param might be a country name or code, we need to handle both cases
         let data;
         
-        // Check if the parameter is a country code (typically 2 or 3 characters)
+        //Check if the parameter is a country code (typically 2 or 3 characters)
+        //How about just we see it's int form or not?siur
+
         if (name.length <= 3) {
           data = await CountryService.getByCountryCode(name);
         } else {

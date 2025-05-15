@@ -19,7 +19,7 @@ const Search = ({ onSearch }) => {
           type="text"
           name="search"
           placeholder="Search for a country..."
-          className="w-full py-3 pl-10 pr-4 rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+          className="w-full py-3 pl-10 pr-4 text-white rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
         />
       </div>
     </form>
