@@ -32,6 +32,5 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.5",
     "vite": "^6.3.1"
-  },
-  "homepage": "https://udithgunasekara.github.io/Country-Explorer"
+  }
 }
