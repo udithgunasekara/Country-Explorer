@@ -1,14 +1,16 @@
+import React, { useState } from 'react';
 
-import React from 'react';
 const Search = ({ onSearch }) => {
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const searchTerm = e.target.elements.search.value.trim();
-    onSearch(searchTerm);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    onSearch(value.trim());
   };
 
   return (
-    <form onSubmit={handleSearch} className="mb-6">
+    <form onSubmit={(e) => e.preventDefault()} className="mb-6">
       <div className="relative max-w-md">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -20,6 +22,8 @@ const Search = ({ onSearch }) => {
           name="search"
           placeholder="Search for a country..."
           className="w-full py-3 pl-10 pr-4 text-white rounded-lg border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+          value={searchTerm}
+          onChange={handleInputChange}
         />
       </div>
     </form>

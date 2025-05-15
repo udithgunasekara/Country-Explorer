@@ -11,30 +11,42 @@ const api = axios.create({
 
 const CountryService = {
   getAllCountries: async () => {
-    try {
-      const response = await api.get('/all');
-      if (!localStorage.key('countryService')){
-         localStorage.setItem('countryService', response.data);
-      }
-
-      if (!response){
-        return localStorage.getItem('countryService')
-      }
-      
-      return response.data;
-    } catch (error) {
-      throw new Error('Failed to fetch countries');
+  try {
+    const cachedData = localStorage.getItem('countryService');
+    if (cachedData) {
+      return JSON.parse(cachedData); // Return cached data
     }
-  },
 
+    const response = await api.get('/all');
+    localStorage.setItem('countryService', JSON.stringify(response.data));
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch countries');
+  }
+},
+  // searchByName: async (name) => {
+  //   try {
+  //     const response = await api.get(`/name/${name}`);
+  //     return response.data;
+  //   } catch (error) {
+  //     throw new Error('Country not found');
+  //   }
+  // },
   searchByName: async (name) => {
-    try {
-      const response = await api.get(`/name/${name}`);
-      return response.data;
-    } catch (error) {
-      throw new Error('Country not found');
+  if (!name || name.trim() === '') {
+    return []; // Return empty array for empty search term
+  }
+
+  try {
+    const response = await api.get(`/name/${name}`);
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return []; // No results found
     }
-  },
+    throw new Error('Failed to fetch countries');
+  }
+},
 
   filterByRegion: async (region) => {
     try {

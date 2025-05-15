@@ -1,48 +1,57 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Search from '../components/Search';
 import Filter from '../components/Filter';
 import CountryCard from '../components/CountryCard';
 import SkeletonLoader from '../components/SkeletonLoader';
+import CountryService from '../service/api';
 
 const HomePage = ({ countries = [], isLoading, error, setCountries }) => {
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [localLoading, setLocalLoading] = useState(false);
-  
-  // Set filtered countries whenever the main countries array changes
+  const [searchError, setSearchError] = useState('');
+
   useEffect(() => {
     setFilteredCountries(countries);
   }, [countries]);
 
   const handleSearch = async (searchTerm) => {
-    if (!searchTerm) {
-      setFilteredCountries(countries);
-      return;
-    }
+    setSearchError('');
+    setLocalLoading(true);
 
     try {
-      const data = await CountryService.searchByName(searchTerm);
+      const data = searchTerm ? 
+        await CountryService.searchByName(searchTerm) : 
+        countries;
+      
       setFilteredCountries(data);
+      
+      if (data.length === 0) {
+        setSearchError('No countries found matching your search');
+      }
     } catch (err) {
+      setSearchError('Failed to perform search. Please try again.');
       setFilteredCountries([]);
+    } finally {
+      setLocalLoading(false);
     }
   };
 
   const handleFilter = async (region) => {
-    if (!region) {
-      setFilteredCountries(countries);
-      return;
-    }
-
     try {
-      const data = await CountryService.filterByRegion(region);
+      setLocalLoading(true);
+      const data = region ? 
+        await CountryService.filterByRegion(region) : 
+        countries;
       setFilteredCountries(data);
     } catch (err) {
+      setSearchError('Failed to apply filter');
       setFilteredCountries([]);
+    } finally {
+      setLocalLoading(false);
     }
   };
 
-  if (isLoading || localLoading) return <SkeletonLoader />;
+  if (isLoading) return <SkeletonLoader />;
   if (error) return <div className="text-red-500 text-center py-8">{error}</div>;
 
   return (
@@ -52,16 +61,26 @@ const HomePage = ({ countries = [], isLoading, error, setCountries }) => {
         <Filter onFilter={handleFilter} />
       </div>
 
-      {filteredCountries.length === 0 ? (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-300">
-          No countries found. Try a different search or filter.
-        </div>
+      {searchError && (
+        <div className="text-red-500 text-center py-8">{searchError}</div>
+      )}
+
+      {localLoading ? (
+        <SkeletonLoader />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredCountries.map(country => (
-            <CountryCard key={country.cca3} country={country} />
-          ))}
-        </div>
+        <>
+          {filteredCountries.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-300">
+              No countries found. Try a different search or filter.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredCountries.map(country => (
+                <CountryCard key={country.cca3} country={country} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </>
   );
